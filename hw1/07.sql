@@ -1,0 +1,1 @@
+SELECT name, count(violation_county) AS county_num FROM parties INNER JOIN cases ON parties.case_id=cases.case_id WHERE name!="" AND parties.type like "%defendant%" GROUP BY violation_county ORDER BY county_num DESC LIMIT 3;
