@@ -9,6 +9,7 @@
 
 #pragma once
 #include <deque>
+#include <mutex>
 
 #include "buffer/replacer.h"
 #include "hash/extendible_hash.h"
@@ -34,6 +35,7 @@ public:
 private:
   // add your member variables here
   std::deque<T>* deque_;
+  class WfirstRWLock* lk_;
 };
 
 } // namespace cmudb
