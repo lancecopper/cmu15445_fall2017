@@ -1,1 +1,2 @@
-SELECT count(DISTINCT(name)) FROM attorneys;
+SELECT count(DISTINCT(name)) 
+FROM attorneys;

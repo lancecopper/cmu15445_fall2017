@@ -8,9 +8,11 @@
  */
 
 #pragma once
+#include <deque>
 
 #include "buffer/replacer.h"
 #include "hash/extendible_hash.h"
+#include "common/logger.h"
 
 namespace cmudb {
 
@@ -31,6 +33,7 @@ public:
 
 private:
   // add your member variables here
+  std::deque<T>* deque_;
 };
 
 } // namespace cmudb

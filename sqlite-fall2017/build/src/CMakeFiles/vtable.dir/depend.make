@@ -8,6 +8,7 @@ src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/catal
 src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/catalog/schema.h
 src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/common/config.h
 src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/common/exception.h
+src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/common/logger.h
 src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/common/rid.h
 src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/common/rwmutex.h
 src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/disk/disk_manager.h
@@ -26,6 +27,7 @@ src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/buffer/buffer
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/buffer/lru_replacer.h
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/buffer/replacer.h
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/common/config.h
+src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/common/logger.h
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/common/rwmutex.h
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/hash/extendible_hash.h
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/hash/hash_table.h
@@ -176,6 +178,7 @@ src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/catalog/col
 src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/catalog/schema.h
 src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/common/config.h
 src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/common/exception.h
+src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/common/logger.h
 src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/common/rid.h
 src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/common/rwmutex.h
 src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/disk/disk_manager.h
@@ -244,6 +247,7 @@ src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/c
 src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/catalog/schema.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/common/config.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/common/exception.h
+src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/common/logger.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/common/rid.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/common/rwmutex.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/disk/disk_manager.h
@@ -269,6 +273,7 @@ src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/catal
 src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/catalog/schema.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/common/config.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/common/exception.h
+src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/common/logger.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/common/rid.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/common/rwmutex.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/disk/disk_manager.h
@@ -294,6 +299,7 @@ src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/catalog/co
 src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/catalog/schema.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/common/config.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/common/exception.h
+src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/common/logger.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/common/rid.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/common/rwmutex.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/disk/disk_manager.h
