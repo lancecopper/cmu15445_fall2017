@@ -66,10 +66,14 @@ ExtendibleHash<K, V>::ExtendibleHash(size_t size): bucket_size(size){
  */
 template <typename K, typename V>
 size_t ExtendibleHash<K, V>::HashKey(const K &key) {
+  /*
   K temp_key = key;
   long long unsigned bitstring = 0;
   unique_readguard<WfirstRWLock> lock(*mask_lk);
   memcpy(&bitstring, &temp_key, sizeof(K));
+  bitstring &= depth_mask;
+  */
+  size_t bitstring = std::hash<K>{}(key);
   bitstring &= depth_mask;
   return bitstring;
 }
@@ -150,7 +154,6 @@ bool ExtendibleHash<K, V>::Remove(const K &key) {
 template <typename K, typename V>
 void ExtendibleHash<K, V>::Insert(const K &key, const V &value) {
   global_lk->lock_read();
-  std::cout << "Insert" << "  key: " << key  << std::endl;
   struct bucket* p = directory[HashKey(key)];
   p->local_lk->lock_write();
   // insert directly if the key or an empty slot is found
@@ -178,7 +181,6 @@ void ExtendibleHash<K, V>::Insert(const K &key, const V &value) {
   }
   p->local_lk->release_write();
   // increase global depth
-  std::cout << "@@increase global depty: " << std::endl;
   global_lk->release_read();
   global_lk->lock_write();
   if(p->local_depth == global_depth){
@@ -231,8 +233,8 @@ void ExtendibleHash<K, V>::Insert(const K &key, const V &value) {
   delete p->local_lk;
   delete p;
   // Try to insert again;
-  SafeInsert(key, value);
   global_lk->release_write();
+  Insert(key, value);
   //debug(1);
 }
 // helper function SafeInsert used in Insert for DRY

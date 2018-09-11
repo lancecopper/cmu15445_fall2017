@@ -25,7 +25,6 @@
 #include "index/generic_key.h"
 
 namespace cmudb {
-
 #define MappingType std::pair<KeyType, ValueType>
 
 #define INDEX_TEMPLATE_ARGUMENTS                                               \
@@ -66,5 +65,4 @@ private:
   page_id_t parent_page_id_;
   page_id_t page_id_;
 };
-
 } // namespace cmudb
