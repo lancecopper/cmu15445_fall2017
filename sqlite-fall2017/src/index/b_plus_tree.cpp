@@ -12,6 +12,9 @@
 
 namespace cmudb {
 
+#define MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE                                         \
+  BPlusTreeInternalPage<KeyType, page_id_t, KeyComparator>
+
 INDEX_TEMPLATE_ARGUMENTS
 BPLUSTREE_TYPE::BPlusTree(const std::string &name,
                                 BufferPoolManager *buffer_pool_manager,
@@ -44,7 +47,7 @@ bool BPLUSTREE_TYPE::GetValue(const KeyType &key,
   auto page = buffer_pool_manager_->FetchPage(root_page_id_);
   BPlusTreePage *node = reinterpret_cast<BPlusTreePage *>(page->GetData());
   while(!(node->IsLeafPage())){
-    RID rid = (static_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(node))->Lookup(key, comparator_);
+    RID rid = (static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(node))->Lookup(key, comparator_);
     buffer_pool_manager_->UnpinPage(page->GetPageId(), false);
     page = buffer_pool_manager_->FetchPage(rid.GetPageId());
     node = reinterpret_cast<BPlusTreePage *>(page->GetData());
@@ -117,7 +120,7 @@ bool BPLUSTREE_TYPE::InsertIntoLeaf(const KeyType &key, const ValueType &value,
   auto page = buffer_pool_manager_->FetchPage(root_page_id_);
   BPlusTreePage *node = reinterpret_cast<BPlusTreePage *>(page->GetData());
   while(!(node->IsLeafPage())){
-    RID rid= (static_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(node))->Lookup(key, comparator_);
+    RID rid= (static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(node))->Lookup(key, comparator_);
     buffer_pool_manager_->UnpinPage(page->GetPageId(), false);
     page = buffer_pool_manager_->FetchPage(rid.GetPageId());
     node = reinterpret_cast<BPlusTreePage *>(page->GetData());
@@ -186,8 +189,8 @@ void BPLUSTREE_TYPE::InsertIntoParent(BPlusTreePage *old_node,
     root_page_id_ = page_id;
     UpdateRootPageId(false);
     auto page = buffer_pool_manager_->FetchPage(root_page_id_);
-    B_PLUS_TREE_INTERNAL_PAGE_TYPE *root = 
-      reinterpret_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(page->GetData());
+    MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *root = 
+      reinterpret_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(page->GetData());
     root->Init(page_id, INVALID_PAGE_ID);
     old_node->SetPageId(page_id);
     new_node->SetPageId(page_id);
@@ -200,11 +203,11 @@ void BPLUSTREE_TYPE::InsertIntoParent(BPlusTreePage *old_node,
                             static_cast<B_PLUS_TREE_LEAF_PAGE_TYPE*>(new_node)->GetPageId());
     }else{
       root->InsertNodeAfter(INVALID_PAGE_ID, 
-                            static_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(old_node)->KeyAt(0), 
-                            static_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(old_node)->GetPageId());
+                            static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(old_node)->KeyAt(0), 
+                            static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(old_node)->GetPageId());
       root->InsertNodeAfter(old_node->GetPageId(), 
-                            static_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(new_node)->KeyAt(0), 
-                            static_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(new_node)->GetPageId());
+                            static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(new_node)->KeyAt(0), 
+                            static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(new_node)->GetPageId());
     }
     buffer_pool_manager_->UnpinPage(root_page_id_, true);
     return;
@@ -212,26 +215,19 @@ void BPLUSTREE_TYPE::InsertIntoParent(BPlusTreePage *old_node,
   // find the parent page
   page_id_t parent_id = old_node->GetParentPageId();  
   auto page = buffer_pool_manager_->FetchPage(parent_id);
-  auto parent = reinterpret_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(page->GetData());
-  // deal with recursive split  
-  if(old_node->IsLeafPage()){
-    parent->InsertNodeAfter(INVALID_PAGE_ID, 
-                            static_cast<B_PLUS_TREE_LEAF_PAGE_TYPE*>(old_node)->KeyAt(0), 
-                            static_cast<B_PLUS_TREE_LEAF_PAGE_TYPE*>(old_node)->GetPageId());
+  auto parent = reinterpret_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(page->GetData());
+  if(old_node->IsLeafPage())
     parent->InsertNodeAfter(old_node->GetPageId(), 
                             static_cast<B_PLUS_TREE_LEAF_PAGE_TYPE*>(new_node)->KeyAt(0), 
                             static_cast<B_PLUS_TREE_LEAF_PAGE_TYPE*>(new_node)->GetPageId());
-  }else{
-    parent->InsertNodeAfter(INVALID_PAGE_ID, 
-                            static_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(old_node)->KeyAt(0), 
-                            static_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(old_node)->GetPageId());
+  else
     parent->InsertNodeAfter(old_node->GetPageId(), 
-                            static_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(new_node)->KeyAt(0), 
-                            static_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(new_node)->GetPageId());
-  }
+                            static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(new_node)->KeyAt(0), 
+                            static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE*>(new_node)->GetPageId());
+  // deal with recursive split  
   if(parent->GetSize() > parent->GetMaxSize())
   {
-    B_PLUS_TREE_INTERNAL_PAGE_TYPE *new_internal_node = Split(parent);
+    MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *new_internal_node = Split(parent);
     KeyType split_key = new_internal_node->KeyAt(0);
     InsertIntoParent(static_cast<BPlusTreePage *>(parent), 
                      split_key, 
@@ -259,7 +255,7 @@ void BPLUSTREE_TYPE::Remove(const KeyType &key, Transaction *transaction) {
   auto page = buffer_pool_manager_->FetchPage(root_page_id_);
   BPlusTreePage *node = reinterpret_cast<BPlusTreePage *>(page->GetData());
   while(!(node->IsLeafPage())){
-    RID rid = (static_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(node))->Lookup(key, comparator_);
+    RID rid = (static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(node))->Lookup(key, comparator_);
     buffer_pool_manager_->UnpinPage(page->GetPageId(), false);
     page = buffer_pool_manager_->FetchPage(rid.GetPageId());
     node = reinterpret_cast<BPlusTreePage *>(page->GetData());
@@ -287,15 +283,15 @@ bool BPLUSTREE_TYPE::CoalesceOrRedistribute(N *node, Transaction *transaction)
     return AdjustRoot(node);
   page_id_t parent_id = node->GetParentPageId();
   auto page = buffer_pool_manager_->FetchPage(parent_id);
-  auto parent = reinterpret_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(page->GetData());
+  auto parent = reinterpret_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(page->GetData());
   int index = parent->ValueIndex(node->GetPageId());
-  N* left_sib, right_sib;
+  N *left_sib, *right_sib;
   // try to redistribute with left sibling
   if(index != 0){
     page = buffer_pool_manager_->FetchPage(parent->ValueAt(index - 1));
     left_sib = reinterpret_cast<N *>(page);
     if(left_sib->GetSize() + node->GetSize() > node->GetMaxSize()){
-      Redistribute(left_sib, node, 1);
+      Redistribute(left_sib, node, index);
       buffer_pool_manager_->UnpinPage(parent->GetPageId(), false);
       buffer_pool_manager_->UnpinPage(left_sib->GetPageId(), true);
       return false;
@@ -348,9 +344,11 @@ bool BPLUSTREE_TYPE::Coalesce(
 {
   if(index == 0){
     neighbor_node->MoveAllTo(node, 1, buffer_pool_manager_);
+    parent->Remove(parent->ValueIndex(neighbor_node->GetPageId()));
     buffer_pool_manager_->DeletePage(neighbor_node->GetPageId());
   }else{
     node->MoveAllTo(neighbor_node, index, buffer_pool_manager_);
+    parent->Remove(parent->ValueIndex(node->GetPageId()));
     buffer_pool_manager_->DeletePage(node->GetPageId());
   // deal with redistributte or merge
   if(parent->GetSize() < parent->GetMinSize())
@@ -372,10 +370,19 @@ INDEX_TEMPLATE_ARGUMENTS
 template <typename N>
 void BPLUSTREE_TYPE::Redistribute(N *neighbor_node, N *node, int index) 
 {
-  if(index == 0)
-    neighbor_node->MoveFirstToEndOf(node, buffer_pool_manager_);
-  else
-    neighbor_node->MoveLastToFrontOf(node, buffer_pool_manager_);
+  page_id_t parent_id = node->GetParentPageId();
+  auto page = buffer_pool_manager_->FetchPage(parent_id);
+  MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *parent = 
+    reinterpret_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(page->GetData());
+  if(index == 0){
+    neighbor_node->MoveFirstToEndOf(node, buffer_pool_manager_)
+    parent->SetKeyAt(1, neighbor_node->KeyAt(0));
+  };
+  else{
+    neighbor_node->MoveLastToFrontOf(node, index, buffer_pool_manager_);
+    parent->SetKeyAt(index, node->KeyAt(0));
+  }
+  buffer_pool_manager_->UnpinPage(parent_id, true);
 }
 /*
  * Update root page if necessary
@@ -390,8 +397,9 @@ void BPLUSTREE_TYPE::Redistribute(N *neighbor_node, N *node, int index)
 INDEX_TEMPLATE_ARGUMENTS
 bool BPLUSTREE_TYPE::AdjustRoot(BPlusTreePage *old_root_node) {
   // case 1
-  if(old_root_node->GetSize() == 1 && !old_root_node->IsLeafPage()){
-    root_page_id_ = static_cast<B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(old_root_node)
+  // there is some problem here, RemoveAndReturnOnlyChild shoud return a page_id_t, not RID
+  if(old_root_node->GetSize() == 1 && !(old_root_node->IsLeafPage())){
+    root_page_id_ = static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(old_root_node)
                     ->RemoveAndReturnOnlyChild();
     UpdateRootPageId(false);
     buffer_pool_manager_->DeletePage(old_root_node->GetPageId());

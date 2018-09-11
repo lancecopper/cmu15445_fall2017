@@ -195,6 +195,7 @@ void B_PLUS_TREE_LEAF_PAGE_TYPE::MoveAllTo(BPlusTreeLeafPage *recipient,
                                            int, BufferPoolManager *buffer_pool_manager)
 {
   recipient->CopyAllFrom(&array[0], GetSize());
+  recipient->next_page_id_ = next_page_id_;
   SetSize(0);
 }
 INDEX_TEMPLATE_ARGUMENTS
