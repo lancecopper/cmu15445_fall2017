@@ -24,9 +24,9 @@ void B_PLUS_TREE_LEAF_PAGE_TYPE::Init(page_id_t page_id, page_id_t parent_id) {
   SetPageType(IndexPageType::LEAF_PAGE);
   SetSize(0);
   SetMaxSize((PAGE_SIZE - sizeof(B_PLUS_TREE_LEAF_PAGE_TYPE)) / sizeof(MappingType) - 1);
-  SetPageId(parent_id);
+  SetParentPageId(parent_id);
   SetPageId(page_id);
-  next_page_id_ = INVALID_PAGE_ID;
+  SetNextPageId(INVALID_PAGE_ID);
 }
 
 /**
@@ -89,6 +89,7 @@ int B_PLUS_TREE_LEAF_PAGE_TYPE::Insert(const KeyType &key,
                                        const ValueType &value,
                                        const KeyComparator &comparator) 
 {
+  //LOG_DEBUG("start");
   int index, size = GetSize();
   if(size == 0){
     array[0].first = key;
@@ -110,7 +111,8 @@ int B_PLUS_TREE_LEAF_PAGE_TYPE::Insert(const KeyType &key,
  * SPLIT
  *****************************************************************************/
 /*
- * Remove half of key & value pairs from this page to "recipient" page
+ * Remove half of key & value pairs from this page to "recipient" page, then
+ * update next page id
  */
 INDEX_TEMPLATE_ARGUMENTS
 void B_PLUS_TREE_LEAF_PAGE_TYPE::MoveHalfTo(
@@ -120,12 +122,17 @@ void B_PLUS_TREE_LEAF_PAGE_TYPE::MoveHalfTo(
   int size = GetSize();
   SetSize(size / 2);
   recipient->CopyHalfFrom(&array[GetSize()], size - GetSize());
+  recipient->SetNextPageId(GetNextPageId());
+  SetNextPageId(recipient->GetPageId());
 }
 
 INDEX_TEMPLATE_ARGUMENTS
 void B_PLUS_TREE_LEAF_PAGE_TYPE::CopyHalfFrom(MappingType *items, int size) {
+  int i = GetSize();
   IncreaseSize(size);
-  for(int i = 0; size > 0; size--, items++, i++){
+  assert(GetSize() <= GetMaxSize());
+  for(; size > 0; size--, items++, i++){
+    assert(i <= GetMaxSize());
     array[i].first = items->first;
     array[i].second = items->second;
   }
@@ -143,12 +150,17 @@ INDEX_TEMPLATE_ARGUMENTS
 bool B_PLUS_TREE_LEAF_PAGE_TYPE::Lookup(const KeyType &key, ValueType &value,
                                         const KeyComparator &comparator) const 
 {
+  ////LOG_DEBUG("start");
   int i = 0, size = GetSize();
-  for(; i < size; i++)
+  ////LOG_DEBUG("size: %d, page_id: %d, parent_id: %d,, maxsize: %d", size, GetPageId(), GetParentPageId(), GetMaxSize());
+  for(; i < size; i++){
     if(comparator(array[i].first, key) == 0){
       value = array[i].second;
+      ////LOG_DEBUG("found");
       return true;
     }
+  }
+  ////LOG_DEBUG("not found");
   return false;
 }
 
@@ -165,14 +177,17 @@ INDEX_TEMPLATE_ARGUMENTS
 int B_PLUS_TREE_LEAF_PAGE_TYPE::RemoveAndDeleteRecord(
     const KeyType &key, const KeyComparator &comparator) 
 {
+  ////LOG_DEBUG("start..,  size: %d",  GetSize());
   ValueType value;
   int size = GetSize();
   if(Lookup(key, value, comparator)){
+    ////LOG_DEBUG("search");
     int i = 0;
     for(; i < size; i++)
       if(comparator(array[i].first, key) == 0)
         break;
     assert(i < size);
+    ////LOG_DEBUG("put off all records one pos");
     for(; i < size - 1; i++){
       array[i].first = array[i + 1].first;
       array[i].second = array[i + 1].second;
@@ -194,16 +209,18 @@ INDEX_TEMPLATE_ARGUMENTS
 void B_PLUS_TREE_LEAF_PAGE_TYPE::MoveAllTo(BPlusTreeLeafPage *recipient,
                                            int, BufferPoolManager *buffer_pool_manager)
 {
+  //LOG_DEBUG("start..");
   recipient->CopyAllFrom(&array[0], GetSize());
-  recipient->next_page_id_ = next_page_id_;
+  recipient->SetNextPageId(GetNextPageId());
   SetSize(0);
 }
 INDEX_TEMPLATE_ARGUMENTS
 void B_PLUS_TREE_LEAF_PAGE_TYPE::CopyAllFrom(MappingType *items, int size) 
 {
-  int i;
+  //LOG_DEBUG("start..");
+  int i = GetSize();
   IncreaseSize(size);
-  for(i = GetSize(); size > 0; size--, items++, i++){
+  for(; size > 0; size--, items++, i++){
     array[i].first = items->first;
     array[i].second = items->second;
   }
@@ -260,9 +277,10 @@ void B_PLUS_TREE_LEAF_PAGE_TYPE::CopyFirstFrom(
     array[index + 1].first = array[index].first;
     array[index + 1].second = array[index].second;
   }
+  assert(index == 0);
   array[index + 1].first = items.first;
   array[index + 1].second = items.second;
-  SetSize(GetSize() + 1);
+  IncreaseSize(1);
 }
 
 /*****************************************************************************

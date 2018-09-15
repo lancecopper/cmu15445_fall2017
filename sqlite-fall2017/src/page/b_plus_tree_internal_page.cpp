@@ -23,7 +23,7 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::Init(page_id_t page_id,
   SetPageType(IndexPageType::INTERNAL_PAGE);
   SetSize(0);
   SetMaxSize((PAGE_SIZE - sizeof(B_PLUS_TREE_INTERNAL_PAGE_TYPE)) / sizeof(MappingType) - 1);
-  SetPageId(parent_id);
+  SetParentPageId(parent_id);
   SetPageId(page_id);
 }
 /*
@@ -120,20 +120,15 @@ int B_PLUS_TREE_INTERNAL_PAGE_TYPE::InsertNodeAfter(
     const ValueType &new_value) 
 {
   int index, size = GetSize();
-  if(size == 0){
-    array[0].first = new_key;
-    array[0].second = new_value;
-    SetSize(++size);
-    return size;
-  }
+  assert(size != 0);
   for(index = size - 1; array[index].second != old_value; index--){
-    assert(index >= 0);
+    assert(index != 0);
     array[index + 1].first = array[index].first;
     array[index + 1].second = array[index].second;
   }
   array[index + 1].first = new_key;
   array[index + 1].second = new_value;
-  SetSize(++size);
+  IncreaseSize(1);
   return size;
 }
 
@@ -157,14 +152,18 @@ INDEX_TEMPLATE_ARGUMENTS
 void B_PLUS_TREE_INTERNAL_PAGE_TYPE::CopyHalfFrom(
     MappingType *items, int size, BufferPoolManager *buffer_pool_manager) 
 {
+  int i = GetSize();
   IncreaseSize(size);
-  for(int i = 0; size > 0; size--, items++, i++){
+  for(; size > 0; size--, items++, i++){
     array[i].first = items->first;
-    array[i].second = items->second;    
+    array[i].second = items->second;
     auto *page = buffer_pool_manager->FetchPage(items->second);
+    if (page == nullptr)
+      throw Exception(EXCEPTION_TYPE_INDEX,
+                      "all page are pinned while printing");
     BPlusTreePage *node = reinterpret_cast<BPlusTreePage*>(page->GetData());
     node->SetParentPageId(GetPageId());
-    buffer_pool_manager->UnpinPage(node->GetPageId(), true);
+    assert(buffer_pool_manager->UnpinPage(items->second, true));
   }
 }
 
@@ -220,15 +219,18 @@ INDEX_TEMPLATE_ARGUMENTS
 void B_PLUS_TREE_INTERNAL_PAGE_TYPE::CopyAllFrom(
     MappingType *items, int size, BufferPoolManager *buffer_pool_manager) 
 {
-  int i;
+  int i = GetSize();
   IncreaseSize(size);
-  for(i = GetSize(); size > 0; size--, items++, i++){
+  for(; size > 0; size--, items++, i++){
     array[i].first = items->first;
     array[i].second = items->second;
     auto *page = buffer_pool_manager->FetchPage(items->second);
+    if (page == nullptr)
+      throw Exception(EXCEPTION_TYPE_INDEX,
+                      "all page are pinned while printing");
     BPlusTreePage *node = reinterpret_cast<BPlusTreePage*>(page->GetData());
-    node->SetParentPageId(GetPageId());
-    buffer_pool_manager->UnpinPage(node->GetPageId(), true);
+    node->SetParentPageId(items->second);
+    assert(buffer_pool_manager->UnpinPage(node->GetPageId(), true));
   }
 }
 
@@ -260,7 +262,7 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::CopyLastFrom(
   int size = GetSize();
   array[size].first = pair.first;
   array[size].second = pair.second;
-  SetSize(++size);
+  IncreaseSize(1);
 }
 
 /*
@@ -289,7 +291,7 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::CopyFirstFrom(
   }
   array[index + 1].first = pair.first;
   array[index + 1].second = pair.second;
-  SetSize(GetSize() + 1);
+  IncreaseSize(1);
 }
 
 /*****************************************************************************

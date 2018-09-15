@@ -34,9 +34,11 @@ int BPlusTreePage::GetSize() const {
 }
 void BPlusTreePage::SetSize(int size) {
 	size_ =  size;
+	assert(size_ <= max_size_ + 1);
 }
 void BPlusTreePage::IncreaseSize(int amount) {
 	size_ += amount;
+	assert(size_ <= max_size_ + 1);
 }
 
 /*

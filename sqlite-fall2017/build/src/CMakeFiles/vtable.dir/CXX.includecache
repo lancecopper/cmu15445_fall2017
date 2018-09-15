@@ -479,6 +479,8 @@ type/value.h
 /home/lancecopper/code/cmu15445/sqlite-fall2017/src/buffer/buffer_pool_manager.cpp
 buffer/buffer_pool_manager.h
 /home/lancecopper/code/cmu15445/sqlite-fall2017/src/buffer/buffer/buffer_pool_manager.h
+common/logger.h
+/home/lancecopper/code/cmu15445/sqlite-fall2017/src/buffer/common/logger.h
 
 /home/lancecopper/code/cmu15445/sqlite-fall2017/src/buffer/lru_replacer.cpp
 buffer/lru_replacer.h
@@ -548,6 +550,8 @@ page/page.h
 iostream
 -
 string
+-
+sstream
 -
 common/exception.h
 /home/lancecopper/code/cmu15445/sqlite-fall2017/src/index/common/exception.h

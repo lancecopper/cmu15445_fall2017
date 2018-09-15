@@ -42,7 +42,6 @@ TEST(BPlusTreeTests, InsertTest1) {
     index_key.SetFromInteger(key);
     tree.Insert(index_key, rid, transaction);
   }
-
   std::vector<RID> rids;
   for (auto key : keys) {
     rids.clear();
@@ -64,7 +63,6 @@ TEST(BPlusTreeTests, InsertTest1) {
     EXPECT_EQ(location.GetSlotNum(), current_key);
     current_key = current_key + 1;
   }
-
   EXPECT_EQ(current_key, keys.size() + 1);
 
   bpm->UnpinPage(HEADER_PAGE_ID, true);
@@ -185,7 +183,6 @@ TEST(BPlusTreeTests, DeleteTest1) {
     int64_t value = key & 0xFFFFFFFF;
     EXPECT_EQ(rids[0].GetSlotNum(), value);
   }
-
   int64_t start_key = 1;
   int64_t current_key = start_key;
   index_key.SetFromInteger(start_key);
@@ -196,15 +193,13 @@ TEST(BPlusTreeTests, DeleteTest1) {
     EXPECT_EQ(location.GetSlotNum(), current_key);
     current_key = current_key + 1;
   }
-
   EXPECT_EQ(current_key, keys.size() + 1);
-
+  
   std::vector<int64_t> remove_keys = {1, 5};
   for (auto key : remove_keys) {
     index_key.SetFromInteger(key);
     tree.Remove(index_key, transaction);
   }
-
   start_key = 2;
   current_key = start_key;
   int64_t size = 0;
@@ -219,7 +214,6 @@ TEST(BPlusTreeTests, DeleteTest1) {
   }
 
   EXPECT_EQ(size, 3);
-
   bpm->UnpinPage(HEADER_PAGE_ID, true);
   delete transaction;
   delete disk_manager;
@@ -334,12 +328,15 @@ TEST(BPlusTreeTests, ScaleTest) {
     keys.push_back(key);
   }
 
+  std::cout << "ckpnt 1" << std::endl;
   for (auto key : keys) {
     int64_t value = key & 0xFFFFFFFF;
     rid.Set((int32_t)(key >> 32), value);
     index_key.SetFromInteger(key);
     tree.Insert(index_key, rid, transaction);
   }
+  std::cout << "ckpnt 2" << std::endl;
+  //std::cout << tree.ToString(true) << std::endl;
   std::vector<RID> rids;
   for (auto key : keys) {
     rids.clear();
@@ -350,13 +347,14 @@ TEST(BPlusTreeTests, ScaleTest) {
     int64_t value = key & 0xFFFFFFFF;
     EXPECT_EQ(rids[0].GetSlotNum(), value);
   }
-
   int64_t start_key = 1;
   int64_t current_key = start_key;
   index_key.SetFromInteger(start_key);
+  std::cout << "ckpnt 3" << std::endl;
   for (auto iterator = tree.Begin(index_key); iterator.isEnd() == false;
-       ++iterator) {
+       ) {
     current_key = current_key + 1;
+    ++iterator;
   }
   EXPECT_EQ(current_key, keys.size() + 1);
 
@@ -365,12 +363,13 @@ TEST(BPlusTreeTests, ScaleTest) {
   for (int64_t key = 1; key < remove_scale; key++) {
     remove_keys.push_back(key);
   }
-  // std::random_shuffle(remove_keys.begin(), remove_keys.end());
+  std::cout << "ckpnt 4" << std::endl;
+  //std::cout << tree.ToString(true) << std::endl;
+  //std::random_shuffle(remove_keys.begin(), remove_keys.end());
   for (auto key : remove_keys) {
     index_key.SetFromInteger(key);
     tree.Remove(index_key, transaction);
   }
-
   start_key = 9900;
   current_key = start_key;
   int64_t size = 0;
@@ -380,6 +379,7 @@ TEST(BPlusTreeTests, ScaleTest) {
     current_key = current_key + 1;
     size = size + 1;
   }
+  std::cout << "ckpnt 5" << std::endl;
 
   EXPECT_EQ(size, 100);
 

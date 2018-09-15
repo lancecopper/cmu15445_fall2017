@@ -1,5 +1,5 @@
 #include "buffer/buffer_pool_manager.h"
-
+#include "common/logger.h"
 namespace cmudb {
 
 /*
@@ -47,6 +47,7 @@ BufferPoolManager::~BufferPoolManager() {
  * pointer
  */
 Page *BufferPoolManager::FetchPage(page_id_t page_id) {
+  //LOG_DEBUG("page_id: %d", page_id);
   Page* p;
   if(page_table_->Find(page_id, p)){
     p->pin_count_++;
@@ -83,8 +84,11 @@ Page *BufferPoolManager::FetchPage(page_id_t page_id) {
  */
 bool BufferPoolManager::UnpinPage(page_id_t page_id, bool is_dirty) {
   Page* p;
-  if(!(page_table_->Find(page_id, p)))
+  //LOG_DEBUG("page_id: %d", page_id);
+  if(!(page_table_->Find(page_id, p))){
+    //LOG_DEBUG("can't find the page");
     return false;
+  }
   if(is_dirty)
     p->is_dirty_ = true;
   if(p->pin_count_ > 0){
@@ -92,8 +96,10 @@ bool BufferPoolManager::UnpinPage(page_id_t page_id, bool is_dirty) {
     if(p->pin_count_ == 0)
       replacer_->Insert(p);
     return true;
-  } else
+  }else{
+    //LOG_DEBUG("pin_count below zero: %d", p->pin_count_);
     return false;
+  }  
 }
 
 /*
@@ -120,10 +126,13 @@ bool BufferPoolManager::FlushPage(page_id_t page_id) {
  */
 bool BufferPoolManager::DeletePage(page_id_t page_id) {
   Page* p;
+  //LOG_DEBUG("page_id: %d", page_id);
   if(!(page_table_->Find(page_id, p)))
     return false;
-  if(p->pin_count_ != 0)
+  if(p->pin_count_ != 0){
+    std::cout << "pin_count_ :" << p->pin_count_ << std::endl; 
     return false;
+  }
   replacer_->Erase(p);
   page_table_->Remove(p->page_id_);
   // Update page metadata
@@ -133,7 +142,7 @@ bool BufferPoolManager::DeletePage(page_id_t page_id) {
   p->is_dirty_ = false;
   free_list_->push_back(p);
   disk_manager_->DeallocatePage(p->page_id_);
-  return false; 
+  return true; 
 }
 
 /**
@@ -164,6 +173,18 @@ Page *BufferPoolManager::NewPage(page_id_t &page_id) {
   p->page_id_ = page_id;
   p->pin_count_ = 1;
   p->is_dirty_ = false;
+  //LOG_DEBUG("page_id: %d", page_id);
   return p;
 }
+
+void BufferPoolManager::ShowPinCount(page_id_t page_id){
+  Page* p;
+  //LOG_DEBUG("page_id: %d", page_id);
+  if(!(page_table_->Find(page_id, p))){
+    //LOG_DEBUG("can't find the page");
+    return;
+  }
+  //LOG_DEBUG("pin_count: %d", p->pin_count_);
+};
+
 } // namespace cmudb
