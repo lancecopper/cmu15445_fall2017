@@ -45,7 +45,7 @@ bool BPLUSTREE_TYPE::GetValue(const KeyType &key,
   if(IsEmpty())
     return false;
   ValueType value;
-  auto leaf_node = traverse(key);
+  auto leaf_node = FindLeafPage(key);
   if(leaf_node->Lookup(key, value, comparator_)){
     result.push_back(value);
     assert(buffer_pool_manager_->UnpinPage(leaf_node->GetPageId(), false));
@@ -112,7 +112,7 @@ bool BPLUSTREE_TYPE::InsertIntoLeaf(const KeyType &key, const ValueType &value,
 {
   //LOG_DEBUG("start..");
   ValueType temp_value;
-  auto leaf_node = traverse(key);
+  auto leaf_node = FindLeafPage(key);
   // if the key has existed in the leaf, return false.
   if(leaf_node->Lookup(key, temp_value, comparator_)){
     assert(buffer_pool_manager_->UnpinPage(leaf_node->GetPageId(), false));
@@ -222,7 +222,7 @@ void BPLUSTREE_TYPE::Remove(const KeyType &key, Transaction *transaction) {
   //LOG_DEBUG("start..");
   if(IsEmpty())
     return;
-  B_PLUS_TREE_LEAF_PAGE_TYPE *leaf_node = traverse(key);
+  B_PLUS_TREE_LEAF_PAGE_TYPE *leaf_node = FindLeafPage(key);
   // deal with redistributte or merge
   if(leaf_node->RemoveAndDeleteRecord(key, comparator_) < leaf_node->GetMinSize())
     CoalesceOrRedistribute(leaf_node, transaction);
@@ -426,11 +426,17 @@ INDEX_TEMPLATE_ARGUMENTS
 INDEXITERATOR_TYPE BPLUSTREE_TYPE::Begin(const KeyType &key) {
   B_PLUS_TREE_LEAF_PAGE_TYPE *node;
   if((node = FindLeafPage(key, false)) == nullptr)
-    return INDEXITERATOR_TYPE(comparator_); 
-  return INDEXITERATOR_TYPE(node, key, 
-                            node->KeyIndex(key, comparator_), 
-                            buffer_pool_manager_, 
-                            comparator_);
+    return INDEXITERATOR_TYPE(comparator_);
+  ValueType value;
+  if(node->Lookup(key, value, comparator_)){
+    return INDEXITERATOR_TYPE(node, key, 
+                              node->KeyIndex(key, comparator_), 
+                              buffer_pool_manager_, 
+                              comparator_);
+  }else{
+    assert(buffer_pool_manager_->UnpinPage(node->GetPageId(), false));
+    return INDEXITERATOR_TYPE(comparator_);
+  }
 }
 
 /*****************************************************************************
@@ -440,6 +446,37 @@ INDEXITERATOR_TYPE BPLUSTREE_TYPE::Begin(const KeyType &key) {
  * Find leaf page containing particular key, if leftMost flag == true, find
  * the left most leaf page
  */
+INDEX_TEMPLATE_ARGUMENTS
+B_PLUS_TREE_LEAF_PAGE_TYPE *BPLUSTREE_TYPE::FindLeafPage(const KeyType &key,
+                                                         bool leftMost) 
+{
+  if(IsEmpty())
+    return nullptr;
+  BPlusTreePage *node = PageID2Node(root_page_id_);
+  page_id_t page_id;
+  while(!(node->IsLeafPage())){
+    if(leftMost)
+      page_id = static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(node)->ValueAt(0);
+    else
+      page_id = static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(node)->Lookup(key, comparator_);
+    assert(buffer_pool_manager_->UnpinPage(node->GetPageId(), false));
+    node = PageID2Node(page_id);
+  }
+  return static_cast<B_PLUS_TREE_LEAF_PAGE_TYPE *>(node);
+}
+
+// utility func
+INDEX_TEMPLATE_ARGUMENTS
+BPlusTreePage *BPLUSTREE_TYPE::PageID2Node(page_id_t page_id){
+  auto page = buffer_pool_manager_->FetchPage(page_id);
+  BPlusTreePage *node = reinterpret_cast<BPlusTreePage *>(page->GetData());
+  if(page == nullptr)
+    throw Exception(EXCEPTION_TYPE_INDEX,
+                    "all page are pinned while printing");
+  return node;
+}
+
+/*
 INDEX_TEMPLATE_ARGUMENTS
 B_PLUS_TREE_LEAF_PAGE_TYPE *BPLUSTREE_TYPE::FindLeafPage(const KeyType &key,
                                                          bool leftMost) 
@@ -458,6 +495,34 @@ B_PLUS_TREE_LEAF_PAGE_TYPE *BPLUSTREE_TYPE::FindLeafPage(const KeyType &key,
     return nullptr;
   }
 }
+// utility func
+INDEX_TEMPLATE_ARGUMENTS
+BPlusTreePage *BPLUSTREE_TYPE::PageID2Node(page_id_t page_id){
+  auto page = buffer_pool_manager_->FetchPage(page_id);
+  BPlusTreePage *node = reinterpret_cast<BPlusTreePage *>(page->GetData());
+  if(page == nullptr)
+    throw Exception(EXCEPTION_TYPE_INDEX,
+                    "all page are pinned while printing");
+  return node;
+}
+INDEX_TEMPLATE_ARGUMENTS
+B_PLUS_TREE_LEAF_PAGE_TYPE *BPLUSTREE_TYPE::traverse(const KeyType &key, bool leftMost = false){
+  if(IsEmpty())
+    return nullptr;
+  BPlusTreePage *node = PageID2Node(root_page_id_);
+  page_id_t page_id;
+  while(!(node->IsLeafPage())){
+    if(leftMost)
+      page_id = static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(node)->ValueAt(0);
+    else
+      page_id = static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(node)->Lookup(key, comparator_);
+    assert(buffer_pool_manager_->UnpinPage(node->GetPageId(), false));
+    node = PageID2Node(page_id);
+  }
+  return static_cast<B_PLUS_TREE_LEAF_PAGE_TYPE *>(node);
+}
+*/
+
 
 /*
  * Update/Insert root page id in header page(where page_id = 0, header_page is

@@ -42,7 +42,6 @@ public:
 
 private:
   bool strict_2PL_;
-  // Lance's code below
   HashTable<RID, TxnList*> *lock_table_; // to keep track of locked tuple
 };
 
@@ -59,31 +58,13 @@ public:
     std::unique_lock<std::mutex> ulk(list_mutex_);
     return std::move(ulk); 
   }
-  //inline bool Empty() { return head_ == nullptr; }
-  /*
-  inline std::unique_lock<std::mutex> GetTupleLock() {
-    std::unique_lock<std::mutex> ulk(tuple_mutex_);
-    return std::move(ulk); 
-  }
-  */
-  //inline LockType GetLockType() { return ltype_; }
-  //inline void SetLockType(LockType ltype) { ltype_ = ltype; }
-  //inline size_t GetReadCnt() { return read_cnt_; }
-  //inline void IncReadCnt() { read_cnt_++; }
-  //inline void DecReadCnt() { read_cnt_--; }
   inline TxnListNode *GetHead() { return head_; }
   inline void SetHead(TxnListNode *head) { head_ = head; }
 private:
   std::mutex list_mutex_;
   std::condition_variable cond_;
   volatile txn_id_t waken_txn_id_{ 0 };
-  //std::mutex tuple_mutex_;
-  //LockType ltype_{ LockType::UNLOCKED };
-  //volatile size_t read_cnt_{ 0 };
-  //volatile size_t wait_read_cnt_{ 0 };
-  //volatile size_t wait_write_cnt_{ 0 };
   TxnListNode *head_{ nullptr };
-  // TxnListNode *fist_wait_writer_{ nullptr };
 };
 
 class LockManager::TxnList::TxnListNode{

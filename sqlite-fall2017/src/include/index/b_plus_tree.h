@@ -64,15 +64,11 @@ public:
   B_PLUS_TREE_LEAF_PAGE_TYPE *FindLeafPage(const KeyType &key,
                                            bool leftMost = false);
   // utility func
-  inline BPlusTreePage *PageID2Node(page_id_t page_id){
-    auto page = buffer_pool_manager_->FetchPage(page_id);
-    BPlusTreePage *node = reinterpret_cast<BPlusTreePage *>(page->GetData());
-    if(page == nullptr)
-      throw Exception(EXCEPTION_TYPE_INDEX,
-                      "all page are pinned while printing");
-    return node;
-  }
+  BPlusTreePage *PageID2Node(page_id_t page_id);
+  /*
   inline B_PLUS_TREE_LEAF_PAGE_TYPE *traverse(const KeyType &key, bool leftMost = false){
+    if(IsEmpty())
+      return nullptr; 
     BPlusTreePage *node = PageID2Node(root_page_id_);
     page_id_t page_id;
     while(!(node->IsLeafPage())){
@@ -85,6 +81,7 @@ public:
     }
     return static_cast<B_PLUS_TREE_LEAF_PAGE_TYPE *>(node);
   }
+  */
 
 private:
   void StartNewTree(const KeyType &key, const ValueType &value);

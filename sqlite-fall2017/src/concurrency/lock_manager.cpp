@@ -23,9 +23,12 @@ bool LockManager::LockShared(Transaction *txn, const RID &rid) {
     lock_table_->Insert(rid, txn_list);
   }
   // unlocked or locked in shared mode: insert directly
-  if(txn_list->InsertRead(txn))
+  txn->GetSharedLockSet()->insert(rid);
+  if(txn_list->InsertRead(txn)){
     return true;
+  }
   else{
+    txn->GetSharedLockSet()->erase(rid);
     txn->SetState(TransactionState::ABORTED);
     return false;
   }
@@ -41,9 +44,11 @@ bool LockManager::LockExclusive(Transaction *txn, const RID &rid) {
     txn_list = new TxnList();
     lock_table_->Insert(rid, txn_list);
   }
+  txn->GetExclusiveLockSet()->insert(rid);
   if(txn_list->InsertWrite(txn))
     return true;
   else{
+    txn->GetExclusiveLockSet()->erase(rid);
     txn->SetState(TransactionState::ABORTED);
     return false;
   }

@@ -26,10 +26,10 @@ void WfirstRWLock::release_read(){
 void WfirstRWLock::release_write(){
   std::unique_lock<std::mutex> ulk(counter_mutex);
   if (--write_cnt == 0)  {
-      cond_r.notify_all();
+    cond_r.notify_all();
   }
   else{
-      cond_w.notify_one();
+    cond_w.notify_one();
   }
   inwriteflag = false;
 }
