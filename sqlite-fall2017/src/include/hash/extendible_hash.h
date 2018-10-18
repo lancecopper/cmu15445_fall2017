@@ -19,6 +19,7 @@
 #include <condition_variable>
 
 #include "hash/hash_table.h"
+#include "concurrency/lock_manager.h"
 
 namespace cmudb {
 class WfirstRWLock{

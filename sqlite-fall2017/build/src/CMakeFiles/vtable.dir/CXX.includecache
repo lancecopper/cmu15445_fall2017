@@ -125,6 +125,8 @@ common/rid.h
 ../src/include/concurrency/common/rid.h
 concurrency/transaction.h
 ../src/include/concurrency/concurrency/transaction.h
+hash/extendible_hash.h
+../src/include/concurrency/hash/extendible_hash.h
 
 ../src/include/concurrency/transaction.h
 atomic
@@ -189,6 +191,8 @@ condition_variable
 -
 hash/hash_table.h
 ../src/include/hash/hash/hash_table.h
+concurrency/lock_manager.h
+../src/include/hash/concurrency/lock_manager.h
 
 ../src/include/hash/hash_table.h
 

@@ -73,7 +73,13 @@ size_t ExtendibleHash<K, V>::HashKey(const K &key) {
   memcpy(&bitstring, &temp_key, sizeof(K));
   bitstring &= depth_mask;
   */
-  size_t bitstring = std::hash<K>{}(key);
+  size_t bitstring;
+  if(typeid(key) == typeid(RID)){
+    K key_copy = key, *key_p = &key_copy;
+    bitstring = std::hash<int64_t>{}(reinterpret_cast<RID *>(key_p)->Get());
+  }
+  else
+    bitstring = std::hash<K>{}(key);
   bitstring &= depth_mask;
   return bitstring;
 }
@@ -97,7 +103,7 @@ int ExtendibleHash<K, V>::GetLocalDepth(int bucket_id) const {
   unique_readguard<WfirstRWLock> lock(*global_lk);
   size_t max_subscript = pow(2, global_depth);
   for(size_t offset = 0; offset != max_subscript; offset++){
-    if (directory[offset]->bucket_id == bucket_id)
+    if(directory[offset]->bucket_id == bucket_id)
       return directory[offset]->local_depth;
   }
   return -1;
@@ -306,6 +312,7 @@ void ExtendibleHash<K, V>:: debug(int mode){
 }
 template class ExtendibleHash<page_id_t, Page *>;
 template class ExtendibleHash<Page *, std::list<Page *>::iterator>;
+template class ExtendibleHash<RID, LockManager::TxnList*>;
 // test purpose
 template class ExtendibleHash<int, std::string>;
 template class ExtendibleHash<int, std::list<int>::iterator>;

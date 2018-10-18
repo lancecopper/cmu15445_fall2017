@@ -11,6 +11,8 @@ src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/commo
 src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/common/logger.h
 src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/common/rid.h
 src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/common/rwmutex.h
+src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/concurrency/lock_manager.h
+src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/concurrency/transaction.h
 src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/disk/disk_manager.h
 src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/hash/extendible_hash.h
 src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/include/hash/hash_table.h
@@ -26,12 +28,23 @@ src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o: ../src/buffer/buffer
 
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/buffer/lru_replacer.h
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/buffer/replacer.h
+src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/catalog/column.h
+src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/catalog/schema.h
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/common/config.h
+src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/common/exception.h
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/common/logger.h
+src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/common/rid.h
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/common/rwmutex.h
+src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/concurrency/lock_manager.h
+src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/concurrency/transaction.h
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/hash/extendible_hash.h
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/hash/hash_table.h
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/page/page.h
+src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/table/tuple.h
+src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/type/limits.h
+src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/type/type.h
+src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/type/type_id.h
+src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/include/type/value.h
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o: ../src/buffer/lru_replacer.cpp
 
 src/CMakeFiles/vtable.dir/catalog/column.cpp.o: ../src/include/catalog/column.h
@@ -59,6 +72,8 @@ src/CMakeFiles/vtable.dir/concurrency/lock_manager.cpp.o: ../src/include/common/
 src/CMakeFiles/vtable.dir/concurrency/lock_manager.cpp.o: ../src/include/common/rwmutex.h
 src/CMakeFiles/vtable.dir/concurrency/lock_manager.cpp.o: ../src/include/concurrency/lock_manager.h
 src/CMakeFiles/vtable.dir/concurrency/lock_manager.cpp.o: ../src/include/concurrency/transaction.h
+src/CMakeFiles/vtable.dir/concurrency/lock_manager.cpp.o: ../src/include/hash/extendible_hash.h
+src/CMakeFiles/vtable.dir/concurrency/lock_manager.cpp.o: ../src/include/hash/hash_table.h
 src/CMakeFiles/vtable.dir/concurrency/lock_manager.cpp.o: ../src/include/page/page.h
 src/CMakeFiles/vtable.dir/concurrency/lock_manager.cpp.o: ../src/include/table/tuple.h
 src/CMakeFiles/vtable.dir/concurrency/lock_manager.cpp.o: ../src/include/type/limits.h
@@ -101,11 +116,23 @@ src/CMakeFiles/vtable.dir/disk/disk_manager.cpp.o: ../src/include/common/logger.
 src/CMakeFiles/vtable.dir/disk/disk_manager.cpp.o: ../src/include/disk/disk_manager.h
 src/CMakeFiles/vtable.dir/disk/disk_manager.cpp.o: ../src/disk/disk_manager.cpp
 
+src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/catalog/column.h
+src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/catalog/schema.h
 src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/common/config.h
+src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/common/exception.h
+src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/common/logger.h
+src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/common/rid.h
 src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/common/rwmutex.h
+src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/concurrency/lock_manager.h
+src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/concurrency/transaction.h
 src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/hash/extendible_hash.h
 src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/hash/hash_table.h
 src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/page/page.h
+src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/table/tuple.h
+src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/type/limits.h
+src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/type/type.h
+src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/type/type_id.h
+src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/include/type/value.h
 src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o: ../src/hash/extendible_hash.cpp
 
 src/CMakeFiles/vtable.dir/index/b_plus_tree.cpp.o: ../src/include/buffer/buffer_pool_manager.h
@@ -118,6 +145,7 @@ src/CMakeFiles/vtable.dir/index/b_plus_tree.cpp.o: ../src/include/common/excepti
 src/CMakeFiles/vtable.dir/index/b_plus_tree.cpp.o: ../src/include/common/logger.h
 src/CMakeFiles/vtable.dir/index/b_plus_tree.cpp.o: ../src/include/common/rid.h
 src/CMakeFiles/vtable.dir/index/b_plus_tree.cpp.o: ../src/include/common/rwmutex.h
+src/CMakeFiles/vtable.dir/index/b_plus_tree.cpp.o: ../src/include/concurrency/lock_manager.h
 src/CMakeFiles/vtable.dir/index/b_plus_tree.cpp.o: ../src/include/concurrency/transaction.h
 src/CMakeFiles/vtable.dir/index/b_plus_tree.cpp.o: ../src/include/disk/disk_manager.h
 src/CMakeFiles/vtable.dir/index/b_plus_tree.cpp.o: ../src/include/hash/extendible_hash.h
@@ -149,6 +177,7 @@ src/CMakeFiles/vtable.dir/index/b_plus_tree_index.cpp.o: ../src/include/common/e
 src/CMakeFiles/vtable.dir/index/b_plus_tree_index.cpp.o: ../src/include/common/logger.h
 src/CMakeFiles/vtable.dir/index/b_plus_tree_index.cpp.o: ../src/include/common/rid.h
 src/CMakeFiles/vtable.dir/index/b_plus_tree_index.cpp.o: ../src/include/common/rwmutex.h
+src/CMakeFiles/vtable.dir/index/b_plus_tree_index.cpp.o: ../src/include/concurrency/lock_manager.h
 src/CMakeFiles/vtable.dir/index/b_plus_tree_index.cpp.o: ../src/include/concurrency/transaction.h
 src/CMakeFiles/vtable.dir/index/b_plus_tree_index.cpp.o: ../src/include/disk/disk_manager.h
 src/CMakeFiles/vtable.dir/index/b_plus_tree_index.cpp.o: ../src/include/hash/extendible_hash.h
@@ -181,6 +210,8 @@ src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/common/exce
 src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/common/logger.h
 src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/common/rid.h
 src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/common/rwmutex.h
+src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/concurrency/lock_manager.h
+src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/concurrency/transaction.h
 src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/disk/disk_manager.h
 src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/hash/extendible_hash.h
 src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o: ../src/include/hash/hash_table.h
@@ -250,6 +281,8 @@ src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/c
 src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/common/logger.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/common/rid.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/common/rwmutex.h
+src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/concurrency/lock_manager.h
+src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/concurrency/transaction.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/disk/disk_manager.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/hash/extendible_hash.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o: ../src/include/hash/hash_table.h
@@ -276,6 +309,8 @@ src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/commo
 src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/common/logger.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/common/rid.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/common/rwmutex.h
+src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/concurrency/lock_manager.h
+src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/concurrency/transaction.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/disk/disk_manager.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/hash/extendible_hash.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o: ../src/include/hash/hash_table.h
@@ -302,6 +337,8 @@ src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/common/exc
 src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/common/logger.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/common/rid.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/common/rwmutex.h
+src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/concurrency/lock_manager.h
+src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/concurrency/transaction.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/disk/disk_manager.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/hash/extendible_hash.h
 src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o: ../src/include/hash/hash_table.h
@@ -333,6 +370,8 @@ src/CMakeFiles/vtable.dir/page/table_page.cpp.o: ../src/include/common/rwmutex.h
 src/CMakeFiles/vtable.dir/page/table_page.cpp.o: ../src/include/concurrency/lock_manager.h
 src/CMakeFiles/vtable.dir/page/table_page.cpp.o: ../src/include/concurrency/transaction.h
 src/CMakeFiles/vtable.dir/page/table_page.cpp.o: ../src/include/disk/disk_manager.h
+src/CMakeFiles/vtable.dir/page/table_page.cpp.o: ../src/include/hash/extendible_hash.h
+src/CMakeFiles/vtable.dir/page/table_page.cpp.o: ../src/include/hash/hash_table.h
 src/CMakeFiles/vtable.dir/page/table_page.cpp.o: ../src/include/logging/log_manager.h
 src/CMakeFiles/vtable.dir/page/table_page.cpp.o: ../src/include/logging/log_record.h
 src/CMakeFiles/vtable.dir/page/table_page.cpp.o: ../src/include/page/page.h

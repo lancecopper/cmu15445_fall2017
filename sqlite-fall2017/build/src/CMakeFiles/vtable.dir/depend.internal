@@ -12,6 +12,8 @@ src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o
  ../src/include/common/logger.h
  ../src/include/common/rid.h
  ../src/include/common/rwmutex.h
+ ../src/include/concurrency/lock_manager.h
+ ../src/include/concurrency/transaction.h
  ../src/include/disk/disk_manager.h
  ../src/include/hash/extendible_hash.h
  ../src/include/hash/hash_table.h
@@ -27,12 +29,23 @@ src/CMakeFiles/vtable.dir/buffer/buffer_pool_manager.cpp.o
 src/CMakeFiles/vtable.dir/buffer/lru_replacer.cpp.o
  ../src/include/buffer/lru_replacer.h
  ../src/include/buffer/replacer.h
+ ../src/include/catalog/column.h
+ ../src/include/catalog/schema.h
  ../src/include/common/config.h
+ ../src/include/common/exception.h
  ../src/include/common/logger.h
+ ../src/include/common/rid.h
  ../src/include/common/rwmutex.h
+ ../src/include/concurrency/lock_manager.h
+ ../src/include/concurrency/transaction.h
  ../src/include/hash/extendible_hash.h
  ../src/include/hash/hash_table.h
  ../src/include/page/page.h
+ ../src/include/table/tuple.h
+ ../src/include/type/limits.h
+ ../src/include/type/type.h
+ ../src/include/type/type_id.h
+ ../src/include/type/value.h
  /home/lancecopper/code/cmu15445/sqlite-fall2017/src/buffer/lru_replacer.cpp
 src/CMakeFiles/vtable.dir/catalog/column.cpp.o
  ../src/include/catalog/column.h
@@ -60,6 +73,8 @@ src/CMakeFiles/vtable.dir/concurrency/lock_manager.cpp.o
  ../src/include/common/rwmutex.h
  ../src/include/concurrency/lock_manager.h
  ../src/include/concurrency/transaction.h
+ ../src/include/hash/extendible_hash.h
+ ../src/include/hash/hash_table.h
  ../src/include/page/page.h
  ../src/include/table/tuple.h
  ../src/include/type/limits.h
@@ -102,11 +117,23 @@ src/CMakeFiles/vtable.dir/disk/disk_manager.cpp.o
  ../src/include/disk/disk_manager.h
  /home/lancecopper/code/cmu15445/sqlite-fall2017/src/disk/disk_manager.cpp
 src/CMakeFiles/vtable.dir/hash/extendible_hash.cpp.o
+ ../src/include/catalog/column.h
+ ../src/include/catalog/schema.h
  ../src/include/common/config.h
+ ../src/include/common/exception.h
+ ../src/include/common/logger.h
+ ../src/include/common/rid.h
  ../src/include/common/rwmutex.h
+ ../src/include/concurrency/lock_manager.h
+ ../src/include/concurrency/transaction.h
  ../src/include/hash/extendible_hash.h
  ../src/include/hash/hash_table.h
  ../src/include/page/page.h
+ ../src/include/table/tuple.h
+ ../src/include/type/limits.h
+ ../src/include/type/type.h
+ ../src/include/type/type_id.h
+ ../src/include/type/value.h
  /home/lancecopper/code/cmu15445/sqlite-fall2017/src/hash/extendible_hash.cpp
 src/CMakeFiles/vtable.dir/index/b_plus_tree.cpp.o
  ../src/include/buffer/buffer_pool_manager.h
@@ -119,6 +146,7 @@ src/CMakeFiles/vtable.dir/index/b_plus_tree.cpp.o
  ../src/include/common/logger.h
  ../src/include/common/rid.h
  ../src/include/common/rwmutex.h
+ ../src/include/concurrency/lock_manager.h
  ../src/include/concurrency/transaction.h
  ../src/include/disk/disk_manager.h
  ../src/include/hash/extendible_hash.h
@@ -150,6 +178,7 @@ src/CMakeFiles/vtable.dir/index/b_plus_tree_index.cpp.o
  ../src/include/common/logger.h
  ../src/include/common/rid.h
  ../src/include/common/rwmutex.h
+ ../src/include/concurrency/lock_manager.h
  ../src/include/concurrency/transaction.h
  ../src/include/disk/disk_manager.h
  ../src/include/hash/extendible_hash.h
@@ -182,6 +211,8 @@ src/CMakeFiles/vtable.dir/index/index_iterator.cpp.o
  ../src/include/common/logger.h
  ../src/include/common/rid.h
  ../src/include/common/rwmutex.h
+ ../src/include/concurrency/lock_manager.h
+ ../src/include/concurrency/transaction.h
  ../src/include/disk/disk_manager.h
  ../src/include/hash/extendible_hash.h
  ../src/include/hash/hash_table.h
@@ -251,6 +282,8 @@ src/CMakeFiles/vtable.dir/page/b_plus_tree_internal_page.cpp.o
  ../src/include/common/logger.h
  ../src/include/common/rid.h
  ../src/include/common/rwmutex.h
+ ../src/include/concurrency/lock_manager.h
+ ../src/include/concurrency/transaction.h
  ../src/include/disk/disk_manager.h
  ../src/include/hash/extendible_hash.h
  ../src/include/hash/hash_table.h
@@ -277,6 +310,8 @@ src/CMakeFiles/vtable.dir/page/b_plus_tree_leaf_page.cpp.o
  ../src/include/common/logger.h
  ../src/include/common/rid.h
  ../src/include/common/rwmutex.h
+ ../src/include/concurrency/lock_manager.h
+ ../src/include/concurrency/transaction.h
  ../src/include/disk/disk_manager.h
  ../src/include/hash/extendible_hash.h
  ../src/include/hash/hash_table.h
@@ -303,6 +338,8 @@ src/CMakeFiles/vtable.dir/page/b_plus_tree_page.cpp.o
  ../src/include/common/logger.h
  ../src/include/common/rid.h
  ../src/include/common/rwmutex.h
+ ../src/include/concurrency/lock_manager.h
+ ../src/include/concurrency/transaction.h
  ../src/include/disk/disk_manager.h
  ../src/include/hash/extendible_hash.h
  ../src/include/hash/hash_table.h
@@ -334,6 +371,8 @@ src/CMakeFiles/vtable.dir/page/table_page.cpp.o
  ../src/include/concurrency/lock_manager.h
  ../src/include/concurrency/transaction.h
  ../src/include/disk/disk_manager.h
+ ../src/include/hash/extendible_hash.h
+ ../src/include/hash/hash_table.h
  ../src/include/logging/log_manager.h
  ../src/include/logging/log_record.h
  ../src/include/page/page.h
