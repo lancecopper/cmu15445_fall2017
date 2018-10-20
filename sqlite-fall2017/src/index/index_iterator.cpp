@@ -58,23 +58,20 @@ INDEXITERATOR_TYPE &INDEXITERATOR_TYPE::operator++(){
 		if(next_page_id == INVALID_PAGE_ID){
 			active_ = false;
 			//LOG_DEBUG("iterator to the end: the last leaf node!");
-			buffer_pool_manager_->UnpinPage(node_->GetPageId(), true);
+			UnlockPage();
+			assert(buffer_pool_manager_->UnpinPage(node_->GetPageId(), true));
 			return *this;
 		}
 		else{
+			// Have implemented fetchpage at least twice. 
 			auto page = buffer_pool_manager_->FetchPage(next_page_id);
-			buffer_pool_manager_->UnpinPage(node_->GetPageId(), true);
+			page->WLatch();
+			UnlockPage();
+			assert(buffer_pool_manager_->UnpinPage(node_->GetPageId(), true));
 			node_ = reinterpret_cast<B_PLUS_TREE_LEAF_PAGE_TYPE *>(page->GetData());
 			index_ = 0;	
 		}
 	}
-	/*
-	if(has_key_ && comparator_(node_->KeyAt(index_), key_) != 0){
-		active_ = false;
-		//LOG_DEBUG("iterator to the end: mismatched key!");
-	}
-	*/
-	//LOG_DEBUG("finished!");
 	return *this;
 };
 

@@ -209,6 +209,8 @@ page/b_plus_tree_internal_page.h
 ../src/include/index/page/b_plus_tree_internal_page.h
 page/b_plus_tree_leaf_page.h
 ../src/include/index/page/b_plus_tree_leaf_page.h
+hash/extendible_hash.h
+../src/include/index/hash/extendible_hash.h
 
 ../src/include/index/b_plus_tree_index.h
 map

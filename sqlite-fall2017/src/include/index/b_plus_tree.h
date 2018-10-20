@@ -17,12 +17,14 @@
 #include "index/index_iterator.h"
 #include "page/b_plus_tree_internal_page.h"
 #include "page/b_plus_tree_leaf_page.h"
+#include "hash/extendible_hash.h"
 
 namespace cmudb {
 
 #define BPLUSTREE_TYPE BPlusTree<KeyType, ValueType, KeyComparator>
 #define MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE                                         \
   BPlusTreeInternalPage<KeyType, page_id_t, KeyComparator>
+enum class TraverseMode { LEFT = 0, SEARCH, INSERT, DELETE };
 // Main class providing the API for the Interactive B+ Tree.
 INDEX_TEMPLATE_ARGUMENTS
 class BPlusTree {
@@ -43,8 +45,7 @@ public:
   void Remove(const KeyType &key, Transaction *transaction = nullptr);
 
   // return the value associated with a given key
-  bool GetValue(const KeyType &key, std::vector<ValueType> &result,
-                Transaction *transaction = nullptr);
+  bool GetValue(const KeyType &key, std::vector<ValueType> &result, Transaction *transaction = nullptr);
 
   // index iterator
   INDEXITERATOR_TYPE Begin();
@@ -61,27 +62,109 @@ public:
   void RemoveFromFile(const std::string &file_name,
                       Transaction *transaction = nullptr);
   // expose for test purpose
-  B_PLUS_TREE_LEAF_PAGE_TYPE *FindLeafPage(const KeyType &key,
-                                           bool leftMost = false);
+  Page *FindLeafPage(const KeyType &key,
+                     TraverseMode t_mode,
+                     bool &root_page_id_locked,
+                     Transaction *transaction = nullptr);
   // utility func
-  BPlusTreePage *PageID2Node(page_id_t page_id);
-  /*
-  inline B_PLUS_TREE_LEAF_PAGE_TYPE *traverse(const KeyType &key, bool leftMost = false){
-    if(IsEmpty())
-      return nullptr; 
-    BPlusTreePage *node = PageID2Node(root_page_id_);
-    page_id_t page_id;
-    while(!(node->IsLeafPage())){
-      if(leftMost)
-        page_id = static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(node)->ValueAt(0);
-      else
-        page_id = static_cast<MY_B_PLUS_TREE_INTERNAL_PAGE_TYPE *>(node)->Lookup(key, comparator_);
-      assert(buffer_pool_manager_->UnpinPage(node->GetPageId(), false));
-      node = PageID2Node(page_id);
-    }
-    return static_cast<B_PLUS_TREE_LEAF_PAGE_TYPE *>(node);
+  Page *traverse(const KeyType &key, bool left);
+  inline Page *PageID2Page(page_id_t page_id){
+    auto page = buffer_pool_manager_->FetchPage(page_id);
+    if(page == nullptr)
+      throw Exception(EXCEPTION_TYPE_INDEX,
+                      "all page are pinned while printing");
+    return page;
   }
-  */
+  inline BPlusTreePage *PageID2Node(page_id_t page_id){
+    auto page = PageID2Page(page_id);
+    BPlusTreePage *node = reinterpret_cast<BPlusTreePage *>(page->GetData());
+    return node;
+  }
+  inline void LockRootId(TraverseMode t_mode){
+    if(t_mode == TraverseMode::LEFT || t_mode == TraverseMode::SEARCH)
+      root_lk->lock_read();
+    else if(t_mode == TraverseMode::INSERT || t_mode == TraverseMode::DELETE)
+      root_lk->lock_write();
+    else
+      assert(false);
+  }
+  inline void UnlockRootId(TraverseMode t_mode){
+    if(t_mode == TraverseMode::LEFT || t_mode == TraverseMode::SEARCH)
+      root_lk->release_read();
+    else if(t_mode == TraverseMode::INSERT || t_mode == TraverseMode::DELETE)
+      root_lk->release_write();
+    else
+      assert(false);
+  }
+  inline bool IsSafe(BPlusTreePage *node, TraverseMode t_mode){
+    if(t_mode == TraverseMode::INSERT)
+      return node->GetSize() < node->GetMaxSize();
+    else if(t_mode == TraverseMode::DELETE)
+      return node->GetSize() > node->GetMinSize();
+    else
+      assert(false);
+  }
+  inline void LockPage(Page* page, TraverseMode t_mode){
+    if(t_mode == TraverseMode::LEFT || t_mode == TraverseMode::SEARCH)
+      page->RLatch();
+    else if(t_mode == TraverseMode::INSERT || t_mode == TraverseMode::DELETE)
+      page->WLatch();
+    else
+      assert(false);
+  }
+  inline void UnLockPage(Page* page, TraverseMode t_mode){
+    if(t_mode == TraverseMode::LEFT || t_mode == TraverseMode::SEARCH)
+      page->RUnlatch();
+    else if(t_mode == TraverseMode::INSERT || t_mode == TraverseMode::DELETE)
+      page->WUnlatch();
+    else
+      assert(false);
+  }
+  inline void UnLockTxnPage(Transaction *transaction, 
+                            TraverseMode t_mode,
+                            bool &root_page_id_locked, 
+                            bool dirty = false)
+  {
+    LOG_DEBUG("start..");
+    assert(t_mode == TraverseMode::INSERT || t_mode == TraverseMode::DELETE);
+    std::shared_ptr<std::deque<Page *>> page_set = transaction->GetPageSet();
+    /*
+    for(auto iter = page_set->cbegin(); iter != page_set->cend(); iter++){
+      std::cout << (*iter)->GetPageId() << " " << std::endl;
+    }
+    std::cout << std::endl;
+    */
+    if(root_page_id_locked){
+      UnlockRootId(t_mode);
+      root_page_id_locked = false;
+    }
+    while(!page_set->empty()){
+      auto page = page_set->front();
+      page_set->pop_front();
+      //std::cout << page->GetPageId() << std::endl;
+      UnLockPage(page, t_mode);
+      assert(buffer_pool_manager_->UnpinPage(page->GetPageId(), dirty));
+    }
+    LOG_DEBUG("start..");
+  }
+  inline void DeletePage(Transaction *transaction, page_id_t page_id){
+    LOG_DEBUG("start..");
+    std::cout << "page_id" << page_id << std::endl;
+    std::shared_ptr<std::deque<Page *>> page_set = transaction->GetPageSet();
+    bool find_flag = false;
+    for(auto iter = page_set->cbegin(); iter != page_set->cend(); iter++){
+      if((*iter)->GetPageId() == page_id){
+        page_set->erase(iter);
+        find_flag = true;
+        UnLockPage(*iter, TraverseMode::DELETE);
+        break;
+      }
+    }
+    assert(find_flag);
+    transaction->AddIntoDeletedPageSet(page_id);        
+    assert(buffer_pool_manager_->UnpinPage(page_id, true));    
+    assert(buffer_pool_manager_->DeletePage(page_id));
+  }
 
 private:
   void StartNewTree(const KeyType &key, const ValueType &value);
@@ -115,6 +198,7 @@ private:
   page_id_t root_page_id_;
   BufferPoolManager *buffer_pool_manager_;
   KeyComparator comparator_;
+  class WfirstRWLock* root_lk;
 };
 
 } // namespace cmudb

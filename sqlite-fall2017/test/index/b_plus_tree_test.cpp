@@ -42,6 +42,9 @@ TEST(BPlusTreeTests, InsertTest1) {
     index_key.SetFromInteger(key);
     tree.Insert(index_key, rid, transaction);
   }
+  
+  std::cout << "ckpnt 1" << std::endl;
+
   std::vector<RID> rids;
   for (auto key : keys) {
     rids.clear();
@@ -53,6 +56,7 @@ TEST(BPlusTreeTests, InsertTest1) {
     EXPECT_EQ(rids[0].GetSlotNum(), value);
   }
 
+  std::cout << "ckpnt 2" << std::endl;
   int64_t start_key = 1;
   int64_t current_key = start_key;
   index_key.SetFromInteger(start_key);
@@ -65,6 +69,7 @@ TEST(BPlusTreeTests, InsertTest1) {
   }
   EXPECT_EQ(current_key, keys.size() + 1);
 
+  std::cout << "ckpnt 3" << std::endl;
   bpm->UnpinPage(HEADER_PAGE_ID, true);
   delete transaction;
   delete disk_manager;
@@ -173,6 +178,7 @@ TEST(BPlusTreeTests, DeleteTest1) {
     tree.Insert(index_key, rid, transaction);
   }
 
+  std::cout << "ckpnt 1" << std::endl;
   std::vector<RID> rids;
   for (auto key : keys) {
     rids.clear();
@@ -183,6 +189,8 @@ TEST(BPlusTreeTests, DeleteTest1) {
     int64_t value = key & 0xFFFFFFFF;
     EXPECT_EQ(rids[0].GetSlotNum(), value);
   }
+
+  std::cout << "ckpnt 2" << std::endl;
   int64_t start_key = 1;
   int64_t current_key = start_key;
   index_key.SetFromInteger(start_key);
@@ -195,11 +203,14 @@ TEST(BPlusTreeTests, DeleteTest1) {
   }
   EXPECT_EQ(current_key, keys.size() + 1);
   
+  std::cout << "ckpnt 3" << std::endl;
   std::vector<int64_t> remove_keys = {1, 5};
   for (auto key : remove_keys) {
     index_key.SetFromInteger(key);
     tree.Remove(index_key, transaction);
   }
+
+  std::cout << "ckpnt 4" << std::endl;
   start_key = 2;
   current_key = start_key;
   int64_t size = 0;
@@ -322,6 +333,7 @@ TEST(BPlusTreeTests, ScaleTest) {
   auto header_page = bpm->NewPage(page_id);
   (void)header_page;
 
+
   int64_t scale = 10000;
   std::vector<int64_t> keys;
   for (int64_t key = 1; key < scale; key++) {
@@ -374,6 +386,7 @@ TEST(BPlusTreeTests, ScaleTest) {
   current_key = start_key;
   int64_t size = 0;
   index_key.SetFromInteger(start_key);
+  std::cout << "ckpnt 4.5" << std::endl;
   for (auto iterator = tree.Begin(index_key); iterator.isEnd() == false;
        ++iterator) {
     current_key = current_key + 1;

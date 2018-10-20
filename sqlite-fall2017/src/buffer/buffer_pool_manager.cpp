@@ -47,7 +47,7 @@ BufferPoolManager::~BufferPoolManager() {
  * pointer
  */
 Page *BufferPoolManager::FetchPage(page_id_t page_id) {
-  //LOG_DEBUG("page_id: %d", page_id);
+  LOG_DEBUG("page_id: %d", page_id);
   Page* p;
   if(page_table_->Find(page_id, p)){
     p->pin_count_++;
@@ -84,9 +84,9 @@ Page *BufferPoolManager::FetchPage(page_id_t page_id) {
  */
 bool BufferPoolManager::UnpinPage(page_id_t page_id, bool is_dirty) {
   Page* p;
-  //LOG_DEBUG("page_id: %d", page_id);
+  LOG_DEBUG("page_id: %d", page_id);
   if(!(page_table_->Find(page_id, p))){
-    //LOG_DEBUG("can't find the page");
+    LOG_DEBUG("can't find the page");
     return false;
   }
   if(is_dirty)
@@ -97,7 +97,7 @@ bool BufferPoolManager::UnpinPage(page_id_t page_id, bool is_dirty) {
       replacer_->Insert(p);
     return true;
   }else{
-    //LOG_DEBUG("pin_count below zero: %d", p->pin_count_);
+    LOG_DEBUG("pin_count below zero: %d", p->pin_count_);
     return false;
   }  
 }
@@ -126,7 +126,7 @@ bool BufferPoolManager::FlushPage(page_id_t page_id) {
  */
 bool BufferPoolManager::DeletePage(page_id_t page_id) {
   Page* p;
-  //LOG_DEBUG("page_id: %d", page_id);
+  LOG_DEBUG("page_id: %d", page_id);
   if(!(page_table_->Find(page_id, p)))
     return false;
   if(p->pin_count_ != 0){
@@ -173,18 +173,18 @@ Page *BufferPoolManager::NewPage(page_id_t &page_id) {
   p->page_id_ = page_id;
   p->pin_count_ = 1;
   p->is_dirty_ = false;
-  //LOG_DEBUG("page_id: %d", page_id);
+  LOG_DEBUG("page_id: %d", page_id);
   return p;
 }
 
 void BufferPoolManager::ShowPinCount(page_id_t page_id){
   Page* p;
-  //LOG_DEBUG("page_id: %d", page_id);
+  LOG_DEBUG("page_id: %d", page_id);
   if(!(page_table_->Find(page_id, p))){
-    //LOG_DEBUG("can't find the page");
+    LOG_DEBUG("can't find the page");
     return;
   }
-  //LOG_DEBUG("pin_count: %d", p->pin_count_);
+  LOG_DEBUG("pin_count: %d", p->pin_count_);
 };
 
 } // namespace cmudb

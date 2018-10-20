@@ -34,6 +34,12 @@ public:
 
   IndexIterator &operator++();
 
+  inline void UnlockPage(){
+    auto page = buffer_pool_manager_->FetchPage(node_->GetPageId());
+    page->WUnlatch();
+    assert(buffer_pool_manager_->UnpinPage(node_->GetPageId(), true));
+  }
+
 private:
   // add your own private member variables here
   KeyType key_;
