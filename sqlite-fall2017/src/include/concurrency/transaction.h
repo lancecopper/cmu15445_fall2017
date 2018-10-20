@@ -76,8 +76,8 @@ public:
   inline std::shared_ptr<std::deque<Page *>> GetPageSet() { return page_set_; }
 
   inline void AddIntoPageSet(Page *page) { 
-    LOG_DEBUG("start");
-    std::cout << page->GetPageId() << std::endl;
+    //LOG_DEBUG("start");
+    //std::cout << page->GetPageId() << std::endl;
     page_set_->push_back(page); 
   }
 

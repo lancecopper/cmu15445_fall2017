@@ -125,15 +125,10 @@ public:
                             bool &root_page_id_locked, 
                             bool dirty = false)
   {
-    LOG_DEBUG("start..");
+    //LOG_DEBUG("start..");
     assert(t_mode == TraverseMode::INSERT || t_mode == TraverseMode::DELETE);
+    DeletePage(transaction);
     std::shared_ptr<std::deque<Page *>> page_set = transaction->GetPageSet();
-    /*
-    for(auto iter = page_set->cbegin(); iter != page_set->cend(); iter++){
-      std::cout << (*iter)->GetPageId() << " " << std::endl;
-    }
-    std::cout << std::endl;
-    */
     if(root_page_id_locked){
       UnlockRootId(t_mode);
       root_page_id_locked = false;
@@ -141,31 +136,31 @@ public:
     while(!page_set->empty()){
       auto page = page_set->front();
       page_set->pop_front();
-      //std::cout << page->GetPageId() << std::endl;
       UnLockPage(page, t_mode);
       assert(buffer_pool_manager_->UnpinPage(page->GetPageId(), dirty));
     }
-    LOG_DEBUG("start..");
+    //LOG_DEBUG("start..");
   }
-  inline void DeletePage(Transaction *transaction, page_id_t page_id){
-    LOG_DEBUG("start..");
-    std::cout << "page_id" << page_id << std::endl;
+  inline void DeletePage(Transaction *transaction){
+    //LOG_DEBUG("start..");
     std::shared_ptr<std::deque<Page *>> page_set = transaction->GetPageSet();
-    bool find_flag = false;
-    for(auto iter = page_set->cbegin(); iter != page_set->cend(); iter++){
-      if((*iter)->GetPageId() == page_id){
-        page_set->erase(iter);
-        find_flag = true;
-        UnLockPage(*iter, TraverseMode::DELETE);
-        break;
-      }
+    std::shared_ptr<std::unordered_set<page_id_t>> delete_page_set = 
+      transaction->GetDeletedPageSet();
+    if(delete_page_set->empty())
+      return;
+    for(auto iter1 = delete_page_set->cbegin(); iter1 != delete_page_set->cend(); iter1++){
+      page_id_t page_id = *iter1;
+      for(auto iter = page_set->cbegin(); iter != page_set->cend(); iter++)
+        if((*iter)->GetPageId() == page_id){
+          page_set->erase(iter);
+          UnLockPage(*iter, TraverseMode::DELETE);
+          assert(buffer_pool_manager_->UnpinPage(page_id, true));    
+          break;
+        }
+      assert(buffer_pool_manager_->DeletePage(page_id));
     }
-    assert(find_flag);
-    transaction->AddIntoDeletedPageSet(page_id);        
-    assert(buffer_pool_manager_->UnpinPage(page_id, true));    
-    assert(buffer_pool_manager_->DeletePage(page_id));
+    delete_page_set->clear();
   }
-
 private:
   void StartNewTree(const KeyType &key, const ValueType &value);
 
