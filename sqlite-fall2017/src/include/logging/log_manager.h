@@ -13,6 +13,7 @@
 
 #include "disk/disk_manager.h"
 #include "logging/log_record.h"
+#include "common/logger.h"
 
 namespace cmudb {
 
@@ -24,6 +25,9 @@ public:
     // TODO: you may intialize your own defined memeber variables here
     log_buffer_ = new char[LOG_BUFFER_SIZE];
     flush_buffer_ = new char[LOG_BUFFER_SIZE];
+    log_buffer_offset_ = 0;
+    flush_buffer_offset_ = 0;
+    first_flag_ = true;
   }
 
   ~LogManager() {
@@ -43,6 +47,12 @@ public:
   inline lsn_t GetPersistentLSN() { return persistent_lsn_; }
   inline void SetPersistentLSN(lsn_t lsn) { persistent_lsn_ = lsn; }
   inline char *GetLogBuffer() { return log_buffer_; }
+  
+  // added by lancecopper
+  void PeriodFlush();
+  void WaitFlush();
+  void SwapBuffer();
+  void WakeUpFlushThread();
 
 private:
   // TODO: you may add your own member variables
@@ -55,14 +65,25 @@ private:
   // log buffer related
   char *log_buffer_;
   char *flush_buffer_;
+  int log_buffer_offset_;
+  int flush_buffer_offset_;
   // latch to protect shared member variables
   std::mutex latch_;
   // flush thread
   std::thread *flush_thread_;
   // for notifying flush thread
   std::condition_variable cv_;
+  // the flush thread will signal for every sucssful flush
+  std::condition_variable flushed_cv_;
   // disk manager
   DiskManager *disk_manager_;
+  // promise for asynchronized flush coordination
+  std::promise<void> *manager_barrier_;
+  bool force_flag_;
+  std::mutex force_flush_mutex_;
+  // added by lancecopper
+  lsn_t buffer_max_lsn_;
+  bool first_flag_ = true;
 };
 
 } // namespace cmudb

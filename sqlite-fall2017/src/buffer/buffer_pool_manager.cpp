@@ -59,8 +59,14 @@ Page *BufferPoolManager::FetchPage(page_id_t page_id) {
       return nullptr;
     replacer_->Erase(p);
     page_table_->Remove(p->page_id_);
-    if(p->is_dirty_)
+    // deal with dirty page: write ahead log, flush page.
+    if(p->is_dirty_){
+      if(ENABLE_LOGGING && p->GetLSN() > log_manager_->GetPersistentLSN()){
+        log_manager_->WakeUpFlushThread();
+        log_manager_->WaitFlush();
+      }
       disk_manager_->WritePage(p->page_id_, p->data_);
+    }
   } else{
     p = free_list_->front();
     free_list_->pop_front();
@@ -160,8 +166,14 @@ Page *BufferPoolManager::NewPage(page_id_t &page_id) {
       return nullptr;
     replacer_->Erase(p);
     page_table_->Remove(p->page_id_);
-    if(p->is_dirty_)
+    // deal with dirty page: write ahead log, flush page.
+    if(p->is_dirty_){
+      if(ENABLE_LOGGING && p->GetLSN() > log_manager_->GetPersistentLSN()){
+        log_manager_->WakeUpFlushThread();
+        log_manager_->WaitFlush();
+      }
       disk_manager_->WritePage(p->page_id_, p->data_);
+    }
   } else{
     p = free_list_->front();
     free_list_->pop_front();

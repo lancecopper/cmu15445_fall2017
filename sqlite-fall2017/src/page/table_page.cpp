@@ -16,6 +16,10 @@ void TablePage::Init(page_id_t page_id, size_t page_size,
   memcpy(GetData(), &page_id, 4); // set page_id
   if (ENABLE_LOGGING) {
     // TODO: add your logging logic here
+    LogRecord log_record(txn->GetTransactionId(), txn->GetPrevLSN(), LogRecordType::NEWPAGE, prev_page_id);
+    auto lsn = log_manager->AppendLogRecord(log_record);
+    txn->SetPrevLSN(lsn);    
+    SetLSN(lsn);
   }
   SetPrevPageId(prev_page_id);
   SetNextPageId(INVALID_PAGE_ID);
@@ -88,6 +92,10 @@ bool TablePage::InsertTuple(const Tuple &tuple, RID &rid, Transaction *txn,
     // acquire the exclusive lock
     assert(lock_manager->LockExclusive(txn, rid.Get()));
     // TODO: add your logging logic here
+    LogRecord log_record(txn->GetTransactionId(), txn->GetPrevLSN(), LogRecordType::INSERT, rid, tuple);
+    auto lsn = log_manager->AppendLogRecord(log_record);
+    txn->SetPrevLSN(lsn);
+    SetLSN(lsn);
   }
   // LOG_DEBUG("Tuple inserted");
   return true;
@@ -129,6 +137,19 @@ bool TablePage::MarkDelete(const RID &rid, Transaction *txn,
       return false;
     }
     // TODO: add your logging logic here
+    // copy out delete value, for undo purpose
+    int32_t tuple_offset = GetTupleOffset(slot_num);
+    Tuple delete_tuple;
+    delete_tuple.size_ = tuple_size;
+    delete_tuple.data_ = new char[delete_tuple.size_];
+    memcpy(delete_tuple.data_, GetData() + tuple_offset, delete_tuple.size_);
+    delete_tuple.rid_ = rid;
+    delete_tuple.allocated_ = true;
+    // construct log_record..
+    LogRecord log_record(txn->GetTransactionId(), txn->GetPrevLSN(), LogRecordType::MARKDELETE, rid, delete_tuple);
+    auto lsn = log_manager->AppendLogRecord(log_record);
+    txn->SetPrevLSN(lsn);
+    SetLSN(lsn);
   }
 
   // set tuple size to negative value
@@ -183,6 +204,11 @@ bool TablePage::UpdateTuple(const Tuple &new_tuple, Tuple &old_tuple,
       return false;
     }
     // TODO: add your logging logic here
+    LogRecord log_record(txn->GetTransactionId(), txn->GetPrevLSN(), LogRecordType::UPDATE, 
+                         rid, old_tuple, new_tuple);
+    auto lsn = log_manager->AppendLogRecord(log_record);
+    txn->SetPrevLSN(lsn);
+    SetLSN(lsn);
   }
 
   // update
@@ -222,19 +248,22 @@ void TablePage::ApplyDelete(const RID &rid, Transaction *txn,
     tuple_size = -tuple_size;
   } // else: rollback insert op
 
-  // copy out delete value, for undo purpose
-  Tuple delete_tuple;
-  delete_tuple.size_ = tuple_size;
-  delete_tuple.data_ = new char[delete_tuple.size_];
-  memcpy(delete_tuple.data_, GetData() + tuple_offset, delete_tuple.size_);
-  delete_tuple.rid_ = rid;
-  delete_tuple.allocated_ = true;
-
   if (ENABLE_LOGGING) {
     // must already grab the exclusive lock
     assert(txn->GetExclusiveLockSet()->find(rid) !=
            txn->GetExclusiveLockSet()->end());
+    // copy out delete value, for undo purpose
+    Tuple delete_tuple;
+    delete_tuple.size_ = tuple_size;
+    delete_tuple.data_ = new char[delete_tuple.size_];
+    memcpy(delete_tuple.data_, GetData() + tuple_offset, delete_tuple.size_);
+    delete_tuple.rid_ = rid;
+    delete_tuple.allocated_ = true;
     // TODO: add your logging logic here
+    LogRecord log_record(txn->GetTransactionId(), txn->GetPrevLSN(), LogRecordType::APPLYDELETE, rid, delete_tuple);
+    auto lsn = log_manager->AppendLogRecord(log_record);
+    txn->SetPrevLSN(lsn);
+    SetLSN(lsn);
   }
 
   int32_t free_space_pointer =
@@ -267,6 +296,21 @@ void TablePage::RollbackDelete(const RID &rid, Transaction *txn,
            txn->GetExclusiveLockSet()->end());
 
     // TODO: add your logging logic here
+    // copy out delete value, for undo purpose
+    int slot_num = rid.GetSlotNum();
+    int32_t tuple_size = GetTupleSize(slot_num);
+    int32_t tuple_offset = GetTupleOffset(slot_num);
+    Tuple delete_tuple;
+    delete_tuple.size_ = tuple_size;
+    delete_tuple.data_ = new char[delete_tuple.size_];
+    memcpy(delete_tuple.data_, GetData() + tuple_offset, delete_tuple.size_);
+    delete_tuple.rid_ = rid;
+    delete_tuple.allocated_ = true;
+    // construct LogRecord
+    LogRecord log_record(txn->GetTransactionId(), txn->GetPrevLSN(), LogRecordType::ROLLBACKDELETE, rid, delete_tuple);
+    auto lsn = log_manager->AppendLogRecord(log_record);
+    txn->SetPrevLSN(lsn);
+    SetLSN(lsn);
   }
 
   int slot_num = rid.GetSlotNum();

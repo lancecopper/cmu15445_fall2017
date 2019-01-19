@@ -6,15 +6,17 @@
 #include "table/table_heap.h"
 
 #include <cassert>
+//#include "common/logger.h"
 namespace cmudb {
 
 Transaction *TransactionManager::Begin() {
   Transaction *txn = new Transaction(next_txn_id_++);
-
   if (ENABLE_LOGGING) {
     // TODO: write log and update transaction's prev_lsn here
+    LogRecord log_record(next_txn_id_ - 1, txn->GetPrevLSN(), LogRecordType::BEGIN);
+    auto lsn = log_manager_->AppendLogRecord(log_record);
+    txn->SetPrevLSN(lsn);
   }
-
   return txn;
 }
 
@@ -35,6 +37,16 @@ void TransactionManager::Commit(Transaction *txn) {
 
   if (ENABLE_LOGGING) {
     // TODO: write log and update transaction's prev_lsn here
+    LOG_DEBUG("transaction commit");
+    LogRecord log_record(next_txn_id_ - 1, txn->GetPrevLSN(), LogRecordType::COMMIT);
+    auto lsn = log_manager_->AppendLogRecord(log_record);
+    txn->SetPrevLSN(lsn);
+    LOG_DEBUG("transaction commit2");
+    while(lsn - log_manager_->GetPersistentLSN() > 0){
+      std::cout << "lsn: " << lsn << "persist_lsn: " << log_manager_->GetPersistentLSN() << std::endl;
+      log_manager_->WaitFlush();
+    }
+    LOG_DEBUG("transaction commit3");
   }
 
   // release all the lock
@@ -47,6 +59,7 @@ void TransactionManager::Commit(Transaction *txn) {
   for (auto locked_rid : lock_set) {
     lock_manager_->Unlock(txn, locked_rid);
   }
+  LOG_DEBUG("transaction committed");
 }
 
 void TransactionManager::Abort(Transaction *txn) {
@@ -72,6 +85,11 @@ void TransactionManager::Abort(Transaction *txn) {
 
   if (ENABLE_LOGGING) {
     // TODO: write log and update transaction's prev_lsn here
+    LogRecord log_record(next_txn_id_ - 1, txn->GetPrevLSN(), LogRecordType::ABORT);
+    auto lsn = log_manager_->AppendLogRecord(log_record);
+    txn->SetPrevLSN(lsn);
+    while(lsn > log_manager_->GetPersistentLSN())
+      log_manager_->WaitFlush();
   }
 
   // release all the lock

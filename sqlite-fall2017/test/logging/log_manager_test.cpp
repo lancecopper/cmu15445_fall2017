@@ -94,6 +94,7 @@ TEST(LogManagerTest, RedoTestWithOneTxn) {
 
   LOG_DEBUG("SLEEPING for 2s");
   std::this_thread::sleep_for(std::chrono::seconds(2));
+  LOG_DEBUG("waking..");
 
   // shutdown System
   delete storage_engine;
