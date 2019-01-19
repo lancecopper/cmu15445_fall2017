@@ -263,6 +263,8 @@ disk/disk_manager.h
 ../src/include/logging/disk/disk_manager.h
 logging/log_record.h
 ../src/include/logging/logging/log_record.h
+common/logger.h
+../src/include/logging/common/logger.h
 
 ../src/include/logging/log_record.h
 cassert
@@ -583,12 +585,16 @@ index/index_iterator.h
 /home/lancecopper/code/cmu15445/sqlite-fall2017/src/logging/log_manager.cpp
 logging/log_manager.h
 /home/lancecopper/code/cmu15445/sqlite-fall2017/src/logging/logging/log_manager.h
+common/logger.h
+/home/lancecopper/code/cmu15445/sqlite-fall2017/src/logging/common/logger.h
 
 /home/lancecopper/code/cmu15445/sqlite-fall2017/src/logging/log_recovery.cpp
 logging/log_recovery.h
 /home/lancecopper/code/cmu15445/sqlite-fall2017/src/logging/logging/log_recovery.h
 page/table_page.h
 /home/lancecopper/code/cmu15445/sqlite-fall2017/src/logging/page/table_page.h
+common/logger.h
+/home/lancecopper/code/cmu15445/sqlite-fall2017/src/logging/common/logger.h
 
 /home/lancecopper/code/cmu15445/sqlite-fall2017/src/page/b_plus_tree_internal_page.cpp
 iostream

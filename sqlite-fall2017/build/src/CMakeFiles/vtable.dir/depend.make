@@ -233,6 +233,7 @@ src/CMakeFiles/vtable.dir/logging/log_manager.cpp.o: ../src/include/catalog/colu
 src/CMakeFiles/vtable.dir/logging/log_manager.cpp.o: ../src/include/catalog/schema.h
 src/CMakeFiles/vtable.dir/logging/log_manager.cpp.o: ../src/include/common/config.h
 src/CMakeFiles/vtable.dir/logging/log_manager.cpp.o: ../src/include/common/exception.h
+src/CMakeFiles/vtable.dir/logging/log_manager.cpp.o: ../src/include/common/logger.h
 src/CMakeFiles/vtable.dir/logging/log_manager.cpp.o: ../src/include/common/rid.h
 src/CMakeFiles/vtable.dir/logging/log_manager.cpp.o: ../src/include/disk/disk_manager.h
 src/CMakeFiles/vtable.dir/logging/log_manager.cpp.o: ../src/include/logging/log_manager.h

@@ -234,6 +234,7 @@ src/CMakeFiles/vtable.dir/logging/log_manager.cpp.o
  ../src/include/catalog/schema.h
  ../src/include/common/config.h
  ../src/include/common/exception.h
+ ../src/include/common/logger.h
  ../src/include/common/rid.h
  ../src/include/disk/disk_manager.h
  ../src/include/logging/log_manager.h
